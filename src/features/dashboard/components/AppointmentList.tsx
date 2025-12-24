@@ -38,14 +38,27 @@ export function AppointmentList(props: AppointmentListProps) {
 
   return (
     <div className="space-y-4">
-      {appointments.map((appointment) => (
-        <AppointmentCard
-          key={appointment.id}
-          appointment={appointment}
-          variant={variant}
-          onStatusUpdate={onStatusUpdate}
-        />
-      ))}
+      {appointments.map((appointment) => {
+        if (variant === 'client') {
+          return (
+            <AppointmentCard
+              key={appointment.id}
+              appointment={appointment as AppointmentWithDoctor}
+              variant="client"
+              onStatusUpdate={onStatusUpdate}
+            />
+          )
+        } else {
+          return (
+            <AppointmentCard
+              key={appointment.id}
+              appointment={appointment as AppointmentWithClient}
+              variant="doctor"
+              onStatusUpdate={onStatusUpdate}
+            />
+          )
+        }
+      })}
     </div>
   )
 }

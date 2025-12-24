@@ -39,10 +39,21 @@ interface UseDoctorDiscoveryReturn {
 }
 
 /**
- * Hook return type for appointments
+ * Hook return type for client appointments
  */
-interface UseAppointmentsReturn {
-  appointments: AppointmentWithDoctor[] | AppointmentWithClient[]
+interface UseClientAppointmentsReturn {
+  appointments: AppointmentWithDoctor[]
+  loading: boolean
+  error: Error | null
+  refreshAppointments: () => Promise<void>
+  updateStatus: (appointmentId: string, status: Appointment['status']) => Promise<void>
+}
+
+/**
+ * Hook return type for doctor appointments
+ */
+interface UseDoctorAppointmentsReturn {
+  appointments: AppointmentWithClient[]
   loading: boolean
   error: Error | null
   refreshAppointments: () => Promise<void>
@@ -127,7 +138,7 @@ export function useDoctorDiscovery(): UseDoctorDiscoveryReturn {
  */
 export function useClientAppointments(
   clientId: string | null
-): UseAppointmentsReturn {
+): UseClientAppointmentsReturn {
   const [appointments, setAppointments] = useState<AppointmentWithDoctor[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -190,7 +201,7 @@ export function useClientAppointments(
  */
 export function useDoctorAppointments(
   doctorId: string | null
-): UseAppointmentsReturn {
+): UseDoctorAppointmentsReturn {
   const [appointments, setAppointments] = useState<AppointmentWithClient[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)

@@ -9,7 +9,12 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { DoctorsList } from './DoctorsList'
+import { useBooking } from '../hooks/useBooking'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { availabilityService } from '@/features/availability/services/availabilityService'
 import type { DoctorPublicProfile } from '@/features/profile/types/profile.types'
+import type { AvailabilitySlot } from '@/features/availability/types/availability.types'
+import type { BookingInput } from '../types/booking.types'
 
 /**
  * DoctorsList wrapper that handles selection
@@ -21,12 +26,6 @@ function DoctorsListWithSelection({
 }) {
   return <DoctorsList onDoctorSelect={onDoctorSelect} />
 }
-import { useBooking } from '../hooks/useBooking'
-import { useAuth } from '@/features/auth/hooks/useAuth'
-import { availabilityService } from '@/features/availability/services/availabilityService'
-import type { DoctorPublicProfile } from '@/features/profile/types/profile.types'
-import type { AvailabilitySlot } from '@/features/availability/types/availability.types'
-import type { BookingInput } from '../types/booking.types'
 
 type WizardStep = 'select-doctor' | 'select-slot' | 'confirm'
 

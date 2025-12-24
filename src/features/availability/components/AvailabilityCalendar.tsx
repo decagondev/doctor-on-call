@@ -21,7 +21,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAvailability } from '../hooks/useAvailability'
-import type { AvailabilitySlotInput, RecurringSlotConfig } from '../types/availability.types'
+import type { RecurringSlotConfig } from '../types/availability.types'
 
 interface AvailabilityCalendarProps {
   doctorId: string

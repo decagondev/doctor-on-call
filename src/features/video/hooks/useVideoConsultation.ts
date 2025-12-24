@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { bookingService } from '@/features/booking/services/bookingService'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { canJoinAppointment } from '../utils/timeValidation'
@@ -39,7 +39,6 @@ export interface UseVideoConsultationReturn {
  */
 export function useVideoConsultation(): UseVideoConsultationReturn {
   const { appointmentId } = useParams<{ appointmentId: string }>()
-  const navigate = useNavigate()
   const { user } = useAuth()
   const [appointment, setAppointment] = useState<Appointment | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -47,15 +46,16 @@ export function useVideoConsultation(): UseVideoConsultationReturn {
   const [timeValidation, setTimeValidation] = useState<TimeValidationResult | null>(null)
 
   useEffect(() => {
-    if (!appointmentId) {
-      setError(new Error('Appointment ID is required'))
-      setLoading(false)
-      return
-    }
-
-    if (!user) {
-      setError(new Error('User must be authenticated'))
-      setLoading(false)
+    // Early validation - set initial state without setState in effect
+    if (!appointmentId || !user) {
+      const errorMessage = !appointmentId
+        ? 'Appointment ID is required'
+        : 'User must be authenticated'
+      // Use requestAnimationFrame to defer state update
+      requestAnimationFrame(() => {
+        setError(new Error(errorMessage))
+        setLoading(false)
+      })
       return
     }
 

@@ -65,7 +65,6 @@ class AvailabilityService {
     doctorId: string,
     slotInput: AvailabilitySlotInput
   ): Promise<string> {
-    const firestore = this.getFirestore()
     const slotsRef = this.getAvailabilityCollection(doctorId)
 
     // Validate slot times
@@ -99,7 +98,6 @@ class AvailabilityService {
     doctorId: string,
     slots: AvailabilitySlotInput[]
   ): Promise<SlotCreationResult> {
-    const firestore = this.getFirestore()
     const slotsRef = this.getAvailabilityCollection(doctorId)
     const slotIds: string[] = []
     let successCount = 0
@@ -163,7 +161,7 @@ class AvailabilityService {
       // Check if this day is in the selected days
       if (config.daysOfWeek.includes(dayOfWeek)) {
         // Generate slots for this day
-        let slotStart = new Date(currentDate)
+        const slotStart = new Date(currentDate)
         slotStart.setHours(startHour, startMinute, 0, 0)
 
         const dayEnd = new Date(currentDate)
@@ -200,7 +198,6 @@ class AvailabilityService {
    * @param slotId - Slot ID to delete
    */
   async deleteSlot(doctorId: string, slotId: string): Promise<void> {
-    const firestore = this.getFirestore()
     const slotRef = doc(
       this.getFirestore(),
       'availability',
@@ -225,7 +222,6 @@ class AvailabilityService {
       unbookedOnly?: boolean
     }
   ): Promise<AvailabilitySlot[]> {
-    const firestore = this.getFirestore()
     const slotsRef = this.getAvailabilityCollection(doctorId)
     const constraints: QueryConstraint[] = [orderBy('start', 'asc')]
 

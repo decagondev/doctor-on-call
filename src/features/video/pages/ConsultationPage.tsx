@@ -20,7 +20,7 @@ import { SEO } from '@/components/seo/SEO'
  * Displays video consultation interface with time validation.
  * Only allows joining within ±5 minutes of appointment start time.
  */
-function ConsultationPageContent(): JSX.Element {
+function ConsultationPageContent(): React.JSX.Element {
   const navigate = useNavigate()
   const { appointment, loading, error, timeValidation, userInfo, canJoin } =
     useVideoConsultation()
@@ -138,7 +138,7 @@ function ConsultationPageContent(): JSX.Element {
  * Consultation Page with Protected Route
  * Requires authentication to access
  */
-export function ConsultationPage(): JSX.Element {
+export function ConsultationPage(): React.JSX.Element {
   return (
     <ProtectedRoute>
       <ConsultationPageContent />

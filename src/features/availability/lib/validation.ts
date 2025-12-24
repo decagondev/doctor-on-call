@@ -14,12 +14,10 @@ import { z } from 'zod'
 export const availabilitySlotSchema = z
   .object({
     start: z.date({
-      required_error: 'Start time is required',
-      invalid_type_error: 'Start time must be a valid date',
+      message: 'Start time is required and must be a valid date',
     }),
     end: z.date({
-      required_error: 'End time is required',
-      invalid_type_error: 'End time must be a valid date',
+      message: 'End time is required and must be a valid date',
     }),
   })
   .refine(
@@ -57,12 +55,10 @@ export const availabilitySlotSchema = z
  */
 export const recurringSlotConfigSchema = z.object({
   startDate: z.date({
-    required_error: 'Start date is required',
-    invalid_type_error: 'Start date must be a valid date',
+    message: 'Start date is required and must be a valid date',
   }),
   endDate: z.date({
-    required_error: 'End date is required',
-    invalid_type_error: 'End date must be a valid date',
+    message: 'End date is required and must be a valid date',
   }),
   startTime: z
     .string()

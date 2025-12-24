@@ -13,7 +13,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  addDoc,
   updateDoc,
   query,
   where,
@@ -21,7 +20,6 @@ import {
   runTransaction,
   Timestamp,
   type Firestore,
-  type DocumentReference,
 } from 'firebase/firestore'
 import type {
   Appointment,

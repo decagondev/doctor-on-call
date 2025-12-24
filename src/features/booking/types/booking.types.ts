@@ -8,6 +8,9 @@
 import type { Timestamp } from 'firebase/firestore'
 import type { DoctorPublicProfile } from '@/features/profile/types/profile.types'
 
+// Re-export for convenience
+export type { DoctorPublicProfile }
+
 /**
  * Appointment status
  */

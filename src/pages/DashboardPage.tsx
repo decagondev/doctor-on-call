@@ -21,7 +21,7 @@ function DashboardContent(): React.JSX.Element {
   const { user } = useAuth()
 
   if (!user) {
-    return null
+    return <div>Loading...</div>
   }
 
   return (

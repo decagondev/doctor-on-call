@@ -38,7 +38,7 @@ export function JitsiRoom({
   userInfo,
   onLeave,
   onError,
-}: JitsiRoomProps): JSX.Element {
+}: JitsiRoomProps): React.JSX.Element {
   const jitsiContainerRef = useRef<HTMLDivElement>(null)
   const apiRef = useRef<JitsiMeetExternalAPI | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
