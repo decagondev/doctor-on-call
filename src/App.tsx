@@ -9,6 +9,8 @@ import { TermsOfServicePage } from "@/pages/TermsOfServicePage"
 import { LoginPage } from "@/features/auth/pages/LoginPage"
 import { SignupPage } from "@/features/auth/pages/SignupPage"
 import { DashboardPage } from "@/pages/DashboardPage"
+import { ProfilePage } from "@/features/profile/pages/ProfilePage"
+import { AdminPage } from "@/features/admin/pages/AdminPage"
 import { appConfig } from "@/config/app.config"
 
 /**
@@ -29,6 +31,8 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/admin" element={<AdminPage />} />
             </Routes>
           </Layout>
         </BrowserRouter>

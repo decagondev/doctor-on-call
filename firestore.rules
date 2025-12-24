@@ -1,0 +1,176 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isClient() {
+      return isAuthenticated() && getUserData().role == 'client';
+    }
+    
+    function isDoctor() {
+      return isAuthenticated() && getUserData().role == 'doctor';
+    }
+    
+    function isApprovedDoctor() {
+      return isAuthenticated() && 
+             getUserData().role == 'doctor' && 
+             getUserData().approved == true;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserData().role == 'admin';
+    }
+    
+    function ownsResource(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Users collection - private user data
+    match /users/{userId} {
+      // Read: Owner or admin
+      allow read: if isAuthenticated() && (ownsResource(userId) || isAdmin());
+      
+      // Create: Only during signup (user creating their own doc)
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       isValidUser();
+      
+      // Update: Owner or admin
+      allow update: if (ownsResource(userId) || isAdmin()) &&
+                       isValidUserUpdate();
+      
+      // Delete: Only admin
+      allow delete: if isAdmin();
+      
+      // Validation functions
+      function isValidUser() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['email', 'name', 'role', 'createdAt']) &&
+               data.email is string && data.email.size() > 0 && data.email.size() < 256 &&
+               data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+               data.role in ['client', 'doctor', 'admin'] &&
+               data.createdAt is timestamp &&
+               (data.approved is bool || !('approved' in data));
+      }
+      
+      function isValidUserUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+        
+        // Role cannot be changed except by admin
+        return data.role == existingData.role || isAdmin() &&
+               // Email cannot be changed
+               data.email == existingData.email &&
+               // Name validation
+               data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+               // PhotoURL validation (optional)
+               (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() < 500)) &&
+               // Approved can only be changed by admin
+               (!('approved' in data) || data.approved == existingData.approved || isAdmin());
+      }
+    }
+    
+    // Doctors collection - public doctor profiles
+    match /doctors/{doctorId} {
+      // Read: Authenticated users can read approved doctor profiles
+      allow read: if isAuthenticated() && 
+                     (resource == null || 
+                      get(/databases/$(database)/documents/users/$(doctorId)).data.approved == true);
+      
+      // Write: Only approved doctors can write their own profile
+      allow write: if isApprovedDoctor() && 
+                      request.auth.uid == doctorId &&
+                      isValidDoctor();
+      
+      // Validation function
+      function isValidDoctor() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['specialty', 'bio']) &&
+               data.specialty is string && data.specialty.size() > 0 && data.specialty.size() < 100 &&
+               data.bio is string && data.bio.size() >= 10 && data.bio.size() < 1000 &&
+               (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() < 500)) &&
+               (!('qualifications' in data) || (data.qualifications is list && data.qualifications.size() <= 20));
+      }
+    }
+    
+    // Availability slots (subcollection)
+    match /availability/{doctorId}/{slotId} {
+      // Read: Authenticated users can read availability
+      allow read: if isAuthenticated();
+      
+      // Write: Only approved doctors can manage their own availability
+      allow write: if isApprovedDoctor() && 
+                      request.auth.uid == doctorId &&
+                      isValidSlot();
+      
+      // Validation function
+      function isValidSlot() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['start', 'end', 'booked']) &&
+               data.start is timestamp &&
+               data.end is timestamp &&
+               data.booked is bool &&
+               data.start < data.end &&
+               data.start > request.time;
+      }
+    }
+    
+    // Appointments collection
+    match /appointments/{appointmentId} {
+      // Read: Client, doctor, or admin who owns/participates in the appointment
+      allow read: if isAuthenticated() && 
+                     (resource.data.clientId == request.auth.uid ||
+                      resource.data.doctorId == request.auth.uid ||
+                      isAdmin());
+      
+      // Create: Only clients can create appointments
+      allow create: if isClient() && 
+                       request.resource.data.clientId == request.auth.uid &&
+                       isValidAppointment();
+      
+      // Update: Client, doctor, or admin who owns/participates in the appointment
+      allow update: if isAuthenticated() && 
+                       (resource.data.clientId == request.auth.uid ||
+                        resource.data.doctorId == request.auth.uid ||
+                        isAdmin()) &&
+                       isValidAppointmentUpdate();
+      
+      // Delete: Only admin
+      allow delete: if isAdmin();
+      
+      // Validation functions
+      function isValidAppointment() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['clientId', 'doctorId', 'slotStart', 'slotEnd', 'status', 'roomName']) &&
+               data.clientId is string &&
+               data.doctorId is string &&
+               data.slotStart is timestamp &&
+               data.slotEnd is timestamp &&
+               data.slotStart < data.slotEnd &&
+               data.status in ['pending', 'confirmed', 'completed', 'cancelled'] &&
+               data.roomName is string && data.roomName.size() > 0 && data.roomName.size() < 200;
+      }
+      
+      function isValidAppointmentUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+        
+        // ClientId and doctorId cannot be changed
+        return data.clientId == existingData.clientId &&
+               data.doctorId == existingData.doctorId &&
+               // Status validation
+               data.status in ['pending', 'confirmed', 'completed', 'cancelled'] &&
+               // RoomName cannot be changed
+               data.roomName == existingData.roomName;
+      }
+    }
+  }
+}
+

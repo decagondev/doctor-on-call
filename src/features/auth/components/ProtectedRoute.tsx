@@ -19,6 +19,7 @@ interface ProtectedRouteProps {
   children: React.JSX.Element
   requireAuth?: boolean
   allowedRoles?: UserRole[]
+  requiredRole?: UserRole // Convenience prop for single role
   redirectTo?: string
 }
 
@@ -36,10 +37,16 @@ export function ProtectedRoute({
   children,
   requireAuth = true,
   allowedRoles,
+  requiredRole,
   redirectTo = '/login',
 }: ProtectedRouteProps): React.JSX.Element {
   const { user, loading } = useAuth()
   const location = useLocation()
+
+  // Combine requiredRole with allowedRoles if provided
+  const rolesToCheck = requiredRole
+    ? [requiredRole, ...(allowedRoles || [])]
+    : allowedRoles
 
   // Show loading state while checking auth
   if (loading) {
@@ -59,9 +66,9 @@ export function ProtectedRoute({
   }
 
   // If user is authenticated but role restrictions apply
-  if (user && allowedRoles && allowedRoles.length > 0) {
+  if (user && rolesToCheck && rolesToCheck.length > 0) {
     // Check if user's role is in allowed roles
-    if (!allowedRoles.includes(user.role)) {
+    if (!rolesToCheck.includes(user.role)) {
       // Redirect to unauthorized page or home
       return <Navigate to="/" replace />
     }
