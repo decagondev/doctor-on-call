@@ -31,7 +31,7 @@ export const signUpSchema = z.object({
     .max(100, 'Name must be less than 100 characters')
     .trim(),
   role: z.enum(['client', 'doctor', 'admin'], {
-    errorMap: () => ({ message: 'Invalid role selected' }),
+    message: 'Invalid role selected',
   }),
 })
 

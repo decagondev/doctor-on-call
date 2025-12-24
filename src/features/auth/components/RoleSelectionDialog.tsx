@@ -5,6 +5,7 @@
  * Follows Single Responsibility Principle - only handles role dialog display.
  */
 
+import * as React from 'react'
 import {
   Dialog,
   DialogContent,
@@ -30,7 +31,7 @@ interface RoleSelectionDialogProps {
 export function RoleSelectionDialog({
   open,
   onClose,
-}: RoleSelectionDialogProps): JSX.Element {
+}: RoleSelectionDialogProps): React.JSX.Element {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>

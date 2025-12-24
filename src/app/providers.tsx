@@ -5,21 +5,21 @@
  * Easy to extend with new providers without modifying existing code.
  */
 
+import * as React from 'react'
 import { AuthProvider } from '@/features/auth/contexts/AuthContext'
-import type { ReactNode } from 'react'
 
 /**
  * App Providers Props
  */
 interface AppProvidersProps {
-  children: ReactNode
+  children: React.ReactNode
 }
 
 /**
  * App Providers Component
  * Wraps application with all necessary context providers
  */
-export function AppProviders({ children }: AppProvidersProps): JSX.Element {
+export function AppProviders({ children }: AppProvidersProps): React.JSX.Element {
   return <AuthProvider>{children}</AuthProvider>
 }
 

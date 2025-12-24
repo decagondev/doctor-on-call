@@ -6,7 +6,8 @@
  * Uses Dependency Inversion Principle - depends on authService abstraction.
  */
 
-import { createContext, useState, useEffect, type ReactNode } from 'react'
+import * as React from 'react'
+import { createContext, useState, useEffect } from 'react'
 import { authService } from '../services/authService'
 import type { User, SignUpInput, SignInInput, AuthContextValue } from '../types/auth.types'
 
@@ -14,6 +15,7 @@ import type { User, SignUpInput, SignInInput, AuthContextValue } from '../types/
  * Auth Context
  * Created with undefined default value to enforce usage within provider
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 /**
@@ -21,14 +23,14 @@ export const AuthContext = createContext<AuthContextValue | undefined>(undefined
  * Following Interface Segregation Principle - minimal props
  */
 interface AuthProviderProps {
-  children: ReactNode
+  children: React.ReactNode
 }
 
 /**
  * Auth Provider Component
  * Manages authentication state and provides auth methods to children
  */
-export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
+export function AuthProvider({ children }: AuthProviderProps): React.JSX.Element {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | null>(null)
@@ -38,16 +40,19 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
    * Loads user document from Firestore when auth state changes
    */
   useEffect(() => {
-    setLoading(true)
-    setError(null)
+    // Initialize loading state - setState in callback, not in effect body
+    let isMounted = true
 
     const unsubscribe = authService.onAuthStateChanged((authUser) => {
-      setUser(authUser)
-      setLoading(false)
-      setError(null)
+      if (isMounted) {
+        setUser(authUser)
+        setLoading(false)
+        setError(null)
+      }
     })
 
     return () => {
+      isMounted = false
       unsubscribe()
     }
   }, [])

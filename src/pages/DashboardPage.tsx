@@ -5,6 +5,7 @@
  * Accessible to all authenticated users.
  */
 
+import * as React from 'react'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
 import { Button } from '@/components/ui/button'
@@ -14,7 +15,7 @@ import { SEO } from '@/components/seo/SEO'
  * Dashboard Content Component
  * Displays user-specific dashboard information
  */
-function DashboardContent(): JSX.Element {
+function DashboardContent(): React.JSX.Element {
   const { user, signOut } = useAuth()
 
   const handleSignOut = async (): Promise<void> => {
@@ -84,7 +85,7 @@ function DashboardContent(): JSX.Element {
  * Dashboard Page Component
  * Wrapped with ProtectedRoute to ensure authentication
  */
-export function DashboardPage(): JSX.Element {
+export function DashboardPage(): React.JSX.Element {
   return (
     <ProtectedRoute>
       <DashboardContent />

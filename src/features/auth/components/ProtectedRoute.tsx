@@ -6,6 +6,7 @@
  * Uses Open-Closed Principle - can extend with new role checks without modification.
  */
 
+import * as React from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import type { UserRole } from '../types/auth.types'
@@ -15,7 +16,7 @@ import type { UserRole } from '../types/auth.types'
  * Following Interface Segregation Principle - minimal, focused props
  */
 interface ProtectedRouteProps {
-  children: JSX.Element
+  children: React.JSX.Element
   requireAuth?: boolean
   allowedRoles?: UserRole[]
   redirectTo?: string
@@ -36,7 +37,7 @@ export function ProtectedRoute({
   requireAuth = true,
   allowedRoles,
   redirectTo = '/login',
-}: ProtectedRouteProps): JSX.Element {
+}: ProtectedRouteProps): React.JSX.Element {
   const { user, loading } = useAuth()
   const location = useLocation()
 

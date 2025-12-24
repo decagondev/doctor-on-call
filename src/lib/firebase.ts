@@ -40,7 +40,7 @@ function getFirebaseConfig(): FirebaseConfig {
 
   // Validate all required config values are present
   const missingKeys = Object.entries(config)
-    .filter(([_, value]) => !value)
+    .filter(([, value]) => !value)
     .map(([key]) => key)
 
   if (missingKeys.length > 0) {

@@ -6,6 +6,7 @@
  * Uses shadcn/ui components and Zod validation.
  */
 
+import * as React from 'react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -37,7 +38,7 @@ interface SignupFormProps {
  * Signup Form Component
  * Displays registration form with role selection
  */
-export function SignupForm({ onSuccess }: SignupFormProps): JSX.Element {
+export function SignupForm({ onSuccess }: SignupFormProps): React.JSX.Element {
   const navigate = useNavigate()
   const { signUp } = useAuth()
   const [isLoading, setIsLoading] = useState<boolean>(false)

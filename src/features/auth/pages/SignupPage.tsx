@@ -5,6 +5,7 @@
  * Redirects authenticated users to dashboard.
  */
 
+import * as React from 'react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -16,7 +17,7 @@ import { SEO } from '@/components/seo/SEO'
  * Signup Page Component
  * Displays signup form and handles redirects for authenticated users
  */
-export function SignupPage(): JSX.Element {
+export function SignupPage(): React.JSX.Element {
   const navigate = useNavigate()
   const { user, loading } = useAuth()
 

@@ -6,6 +6,7 @@
  * Uses shadcn/ui components and Zod validation.
  */
 
+import * as React from 'react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -35,7 +36,7 @@ interface LoginFormProps {
  * Login Form Component
  * Displays email/password login form with validation
  */
-export function LoginForm({ onSuccess }: LoginFormProps): JSX.Element {
+export function LoginForm({ onSuccess }: LoginFormProps): React.JSX.Element {
   const navigate = useNavigate()
   const { signIn } = useAuth()
   const [isLoading, setIsLoading] = useState<boolean>(false)
