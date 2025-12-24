@@ -11,6 +11,7 @@ import { SignupPage } from "@/features/auth/pages/SignupPage"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { ProfilePage } from "@/features/profile/pages/ProfilePage"
 import { AdminPage } from "@/features/admin/pages/AdminPage"
+import { AvailabilityPage } from "@/features/availability/pages/AvailabilityPage"
 import { appConfig } from "@/config/app.config"
 
 /**
@@ -33,6 +34,7 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/availability" element={<AvailabilityPage />} />
             </Routes>
           </Layout>
         </BrowserRouter>
