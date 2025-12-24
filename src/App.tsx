@@ -1,10 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { ThemeProvider } from "@/contexts/ThemeContext"
+import { AppProviders } from "@/app/providers"
 import { Layout } from "@/components/layout/Layout"
 import { LandingPage } from "@/pages/LandingPage"
 import { AboutPage } from "@/pages/AboutPage"
 import { PrivacyPolicyPage } from "@/pages/PrivacyPolicyPage"
 import { TermsOfServicePage } from "@/pages/TermsOfServicePage"
+import { LoginPage } from "@/features/auth/pages/LoginPage"
+import { SignupPage } from "@/features/auth/pages/SignupPage"
+import { DashboardPage } from "@/pages/DashboardPage"
 import { appConfig } from "@/config/app.config"
 
 /**
@@ -14,16 +18,21 @@ import { appConfig } from "@/config/app.config"
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <Layout footerConfig={appConfig.footer}>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
+      <AppProviders>
+        <BrowserRouter>
+          <Layout footerConfig={appConfig.footer}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </AppProviders>
     </ThemeProvider>
   )
 }

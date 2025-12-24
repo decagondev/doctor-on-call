@@ -7,6 +7,9 @@ import { defineConfig } from "vite"
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
+    // Path alias configuration: @/* maps to src/*
+    // Usage: import { Component } from "@/components/Component"
+    // This enables clean imports without relative path navigation
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },

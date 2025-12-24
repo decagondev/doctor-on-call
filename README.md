@@ -1,6 +1,6 @@
-# React TypeScript Vite ShadCN Tailwind 4 Starter
+# Doctor On Call - Secure Online Medical Consultation Platform
 
-A modern, production-ready starter template for building React applications with TypeScript, Vite, ShadCN UI, and Tailwind CSS 4. Designed with SOLID principles, modular architecture, and easy customization in mind.
+A secure, user-friendly web platform that enables patients (clients) to discover, book, and conduct video consultations with verified doctors (consultants). Built with React 19, TypeScript, Vite, Firebase, and Jitsi Meet. Designed with SOLID principles, modular architecture, and security best practices.
 
 ## ✨ Features
 
@@ -8,12 +8,15 @@ A modern, production-ready starter template for building React applications with
 - ⚛️ **React 19** - Latest React with TypeScript
 - 🎨 **ShadCN UI** - Beautiful, accessible component library
 - 🎭 **Tailwind CSS 4** - Modern utility-first CSS
+- 🔥 **Firebase** - Authentication, Firestore, Storage, Cloud Functions
+- 📹 **Jitsi Meet** - Secure video consultations
 - 🌙 **Dark Mode** - Built-in theme toggle (defaults to dark)
 - 📱 **Responsive** - Mobile-first design with collapsible sidebar
 - 🔍 **SEO Ready** - Dynamic metadata management per page
-- 🧭 **React Router** - Client-side routing
+- 🧭 **React Router** - Client-side routing with role-based protection
 - 🚀 **Netlify Ready** - Pre-configured for Netlify deployment
 - 🏗️ **SOLID Principles** - Clean, modular, maintainable code
+- 🔒 **Security First** - Firestore Security Rules v2, input validation, least privilege
 - 📄 **Legal Pages** - Privacy Policy and Terms of Service templates
 
 ## 🚀 Quick Start
@@ -27,16 +30,21 @@ A modern, production-ready starter template for building React applications with
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd react-ts-vite-shadcn-tw4-starter
+cd doctor-on-call
 
 # Install dependencies
 npm install
+
+# Create .env.local file with Firebase configuration
+# See docs/SETUP.md for details
 
 # Start development server
 npm run dev
 ```
 
 Visit `http://localhost:5173` to see your application.
+
+**Note**: Firebase configuration is required. See [Setup Guide](./docs/SETUP.md) for detailed instructions.
 
 ## 📁 Project Structure
 
@@ -107,6 +115,9 @@ import { SEO } from "@/components/seo/SEO"
 
 ## 📚 Documentation
 
+- **[Product Requirements Document](./docs/PRD.md)** - Complete product requirements and architecture
+- **[Task List](./docs/TASKLIST.md)** - Detailed development roadmap
+- **[Architecture Diagrams](./docs/DIAGRAMS.md)** - System architecture and data flow diagrams
 - **[Setup Guide](./docs/SETUP.md)** - Detailed setup and customization instructions
 - **[Deployment Guide](./docs/DEPLOYMENT.md)** - Netlify deployment instructions
 
@@ -119,13 +130,32 @@ import { SEO } from "@/components/seo/SEO"
 
 ## 🏗️ Architecture
 
-This template follows **SOLID principles**:
+This project follows **SOLID principles** and a **feature-based modular structure**:
 
-- **Single Responsibility**: Each component has one clear purpose
-- **Open/Closed**: Components are extensible via props
-- **Liskov Substitution**: Components can be swapped without breaking functionality
-- **Interface Segregation**: Clean, focused interfaces
-- **Dependency Inversion**: Dependencies on abstractions (config, contexts)
+- **Single Responsibility**: Each component/service has one clear purpose
+- **Open/Closed**: Extend via composition, not modification
+- **Liskov Substitution**: Interfaces allow interchangeable implementations
+- **Interface Segregation**: Small, focused hooks/props
+- **Dependency Inversion**: Depend on abstractions (injected Firebase services)
+
+### Feature Structure
+
+```
+src/
+├── features/           # Feature-based modules
+│   ├── auth/          # Authentication
+│   ├── profile/       # User profiles
+│   ├── availability/  # Doctor availability
+│   ├── booking/       # Appointment booking
+│   ├── video/         # Video consultations
+│   ├── dashboard/     # User dashboards
+│   └── admin/         # Admin panel
+├── components/        # Global reusable components
+├── lib/              # Shared utilities
+└── config/           # Application configuration
+```
+
+See [PRD.md](./docs/PRD.md) for detailed architecture documentation.
 
 ## 🚢 Deployment
 
