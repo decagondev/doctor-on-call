@@ -6,6 +6,7 @@
  */
 
 import { format } from 'date-fns'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import type { AppointmentWithDoctor } from '@/features/booking/types/booking.types'
 import type { AppointmentWithClient } from '@/features/booking/types/booking.types'
@@ -28,6 +29,7 @@ type AppointmentCardProps =
  */
 export function AppointmentCard(props: AppointmentCardProps) {
   const { appointment, variant, onStatusUpdate } = props
+  const navigate = useNavigate()
 
   const getStatusColor = (status: string): string => {
     switch (status) {
@@ -110,8 +112,7 @@ export function AppointmentCard(props: AppointmentCardProps) {
             size="sm"
             variant="outline"
             onClick={() => {
-              // Navigate to video consultation
-              window.location.href = `/consultation/${appointment.id}`
+              navigate(`/consultation/${appointment.id}`)
             }}
           >
             Join Consultation

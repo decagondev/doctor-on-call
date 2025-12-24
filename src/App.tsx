@@ -12,6 +12,7 @@ import { DashboardPage } from "@/pages/DashboardPage"
 import { ProfilePage } from "@/features/profile/pages/ProfilePage"
 import { AdminPage } from "@/features/admin/pages/AdminPage"
 import { AvailabilityPage } from "@/features/availability/pages/AvailabilityPage"
+import { ConsultationPage } from "@/features/video/pages/ConsultationPage"
 import { appConfig } from "@/config/app.config"
 
 /**
@@ -35,6 +36,7 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/availability" element={<AvailabilityPage />} />
+              <Route path="/consultation/:appointmentId" element={<ConsultationPage />} />
             </Routes>
           </Layout>
         </BrowserRouter>
