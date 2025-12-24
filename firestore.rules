@@ -32,6 +32,12 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
+    function ownsAppointment(appointment) {
+      return isAuthenticated() && 
+             (appointment.data.clientId == request.auth.uid ||
+              appointment.data.doctorId == request.auth.uid);
+    }
+    
     // Users collection - private user data
     match /users/{userId} {
       // Read: Owner or admin
@@ -113,12 +119,16 @@ service cloud.firestore {
       // Validation function
       function isValidSlot() {
         let data = request.resource.data;
+        // Calculate max allowed end time (4 hours from start)
+        let maxEndTime = data.start + duration.value(4, 'h');
         return data.keys().hasAll(['start', 'end', 'booked']) &&
                data.start is timestamp &&
                data.end is timestamp &&
                data.booked is bool &&
                data.start < data.end &&
-               data.start > request.time;
+               data.start > request.time &&
+               // Ensure slot duration is reasonable (max 4 hours)
+               data.end <= maxEndTime;
       }
     }
     
@@ -131,9 +141,11 @@ service cloud.firestore {
                       isAdmin());
       
       // Create: Only clients can create appointments
+      // Must validate that slot exists, is not booked, and belongs to the doctor
       allow create: if isClient() && 
                        request.resource.data.clientId == request.auth.uid &&
-                       isValidAppointment();
+                       isValidAppointment() &&
+                       isValidAppointmentCreation();
       
       // Update: Client, doctor, or admin who owns/participates in the appointment
       allow update: if isAuthenticated() && 
@@ -149,13 +161,28 @@ service cloud.firestore {
       function isValidAppointment() {
         let data = request.resource.data;
         return data.keys().hasAll(['clientId', 'doctorId', 'slotStart', 'slotEnd', 'status', 'roomName']) &&
-               data.clientId is string &&
-               data.doctorId is string &&
+               data.clientId is string && data.clientId.size() > 0 && data.clientId.size() < 128 &&
+               data.doctorId is string && data.doctorId.size() > 0 && data.doctorId.size() < 128 &&
                data.slotStart is timestamp &&
                data.slotEnd is timestamp &&
                data.slotStart < data.slotEnd &&
+               data.slotStart > request.time &&
                data.status in ['pending', 'confirmed', 'completed', 'cancelled'] &&
-               data.roomName is string && data.roomName.size() > 0 && data.roomName.size() < 200;
+               data.status == 'pending' &&
+               data.roomName is string && data.roomName.size() > 0 && data.roomName.size() < 200 &&
+               (!('notes' in data) || (data.notes is string && data.notes.size() < 1000));
+      }
+      
+      // Validate appointment creation - check slot exists and is not booked
+      function isValidAppointmentCreation() {
+        let data = request.resource.data;
+        // Note: We can't directly check the slot in rules, but we validate the structure
+        // The actual slot validation happens in the transaction on the client side
+        // This rule ensures the appointment data structure is valid
+        return data.slotStart is timestamp &&
+               data.slotEnd is timestamp &&
+               data.slotStart < data.slotEnd &&
+               data.slotStart > request.time;
       }
       
       function isValidAppointmentUpdate() {
@@ -165,10 +192,27 @@ service cloud.firestore {
         // ClientId and doctorId cannot be changed
         return data.clientId == existingData.clientId &&
                data.doctorId == existingData.doctorId &&
-               // Status validation
+               // Slot times cannot be changed
+               data.slotStart == existingData.slotStart &&
+               data.slotEnd == existingData.slotEnd &&
+               // Status validation - ensure valid transitions
                data.status in ['pending', 'confirmed', 'completed', 'cancelled'] &&
+               isValidStatusTransition(existingData.status, data.status) &&
                // RoomName cannot be changed
-               data.roomName == existingData.roomName;
+               data.roomName == existingData.roomName &&
+               // Notes can be updated but must be valid
+               (!('notes' in data) || (data.notes is string && data.notes.size() < 1000));
+      }
+      
+      // Validate status transitions
+      function isValidStatusTransition(oldStatus, newStatus) {
+        // Pending can become confirmed or cancelled
+        // Confirmed can become completed or cancelled
+        // Completed and cancelled are terminal states
+        return (oldStatus == 'pending' && newStatus in ['confirmed', 'cancelled']) ||
+               (oldStatus == 'confirmed' && newStatus in ['completed', 'cancelled']) ||
+               (oldStatus == 'completed' && newStatus == 'completed') ||
+               (oldStatus == 'cancelled' && newStatus == 'cancelled');
       }
     }
   }

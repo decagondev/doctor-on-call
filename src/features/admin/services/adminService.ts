@@ -12,13 +12,12 @@ import {
   collection,
   getDocs,
   doc,
-  updateDoc,
   getDoc,
   query,
   orderBy,
-  serverTimestamp,
   type Firestore,
 } from 'firebase/firestore'
+import { getFunctions, httpsCallable } from 'firebase/functions'
 import type { AdminUserListItem, ApproveUserInput } from '../types/admin.types'
 
 /**
@@ -89,29 +88,41 @@ class AdminService {
 
   /**
    * Approve or reject a doctor
-   * Updates the user document's approved field
-   * Note: In production, this should call a Cloud Function for security
+   * Calls Cloud Function for secure admin action
    */
   async approveUser(input: ApproveUserInput): Promise<void> {
-    const firestore = this.getFirestore()
-    const userRef = doc(firestore, 'users', input.userId)
-    
-    // Verify user exists and is a doctor
-    const userSnap = await getDoc(userRef)
-    if (!userSnap.exists()) {
-      throw new Error('User not found')
-    }
+    const functions = getFunctions()
+    const approveDoctor = httpsCallable<{ userId: string; approved: boolean }, { success: boolean; userId: string; approved: boolean }>(
+      functions,
+      'approveDoctor'
+    )
 
-    const userData = userSnap.data()
-    if (userData.role !== 'doctor') {
-      throw new Error('Only doctors can be approved')
-    }
+    try {
+      const result = await approveDoctor({
+        userId: input.userId,
+        approved: input.approved,
+      })
 
-    // Update approved status
-    await updateDoc(userRef, {
-      approved: input.approved,
-      updatedAt: serverTimestamp(),
-    })
+      if (!result.data.success) {
+        throw new Error('Failed to approve doctor')
+      }
+    } catch (error) {
+      // Handle Firebase Functions errors
+      if (error && typeof error === 'object' && 'code' in error) {
+        const firebaseError = error as { code: string; message: string }
+        switch (firebaseError.code) {
+          case 'permission-denied':
+            throw new Error('You do not have permission to approve doctors')
+          case 'not-found':
+            throw new Error('User not found')
+          case 'invalid-argument':
+            throw new Error('Invalid request. Only doctors can be approved.')
+          default:
+            throw new Error(firebaseError.message || 'Failed to approve doctor')
+        }
+      }
+      throw error
+    }
   }
 
   /**
